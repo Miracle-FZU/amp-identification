@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# 模型权重 (可由脚本重新训练, 不上传)
+models/
+reports/models/
+
+# 克隆的外部仓库
+AMPlify_repo/
+DeepAmPEP_repo/
+
+# 临时文件
+*.log
+.DS_Store
