@@ -266,7 +266,6 @@ def build(src, dst):
                 cap, img = m.group(1), Path(__file__).parent.parent / "reports" / m.group(2)
                 p = doc.add_paragraph()
                 p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                p.paragraph_format.line_spacing = Pt(14)
                 if img.exists():
                     p.add_run().add_picture(str(img), width=Cm(14))
                 para(doc, cap, SONG, SONG, 10.5, align=WD_ALIGN_PARAGRAPH.CENTER, line=14, after=8)
