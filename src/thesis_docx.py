@@ -76,14 +76,45 @@ def add_page_field(section, fmt="decimal", start=1):
 
 def add_toc_field(doc):
     p = doc.add_paragraph()
-    fld = OxmlElement("w:fldSimple")
-    fld.set(qn("w:instr"), r'TOC \o "1-2" \h \z \u')
-    r = OxmlElement("w:r")
-    t = OxmlElement("w:t")
-    t.text = "（打开文档后 Ctrl+A 全选再按 F9 更新目录域）"
-    r.append(t)
-    fld.append(r)
-    p._p.append(fld)
+    r1 = p.add_run()
+    f1 = OxmlElement("w:fldChar")
+    f1.set(qn("w:fldCharType"), "begin")
+    r1._r.append(f1)
+    r2 = p.add_run()
+    it = OxmlElement("w:instrText")
+    it.set(qn("xml:space"), "preserve")
+    it.text = r'TOC \o "1-2" \h \z \u'
+    r2._r.append(it)
+    r3 = p.add_run()
+    f2 = OxmlElement("w:fldChar")
+    f2.set(qn("w:fldCharType"), "separate")
+    r3._r.append(f2)
+    r4 = p.add_run("（打开文档后 Ctrl+A 全选，按 F9 更新目录）")
+    r5 = p.add_run()
+    f3 = OxmlElement("w:fldChar")
+    f3.set(qn("w:fldCharType"), "end")
+    r5._r.append(f3)
+
+
+def heading(doc, text, level):
+    """用内置 Heading 样式(目录域依赖它收集条目), 外观按福大规范重设"""
+    p = doc.add_paragraph(style=f"Heading {level}")
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER if level == 1 else WD_ALIGN_PARAGRAPH.LEFT
+    pf = p.paragraph_format
+    if level == 1:
+        pf.line_spacing = Pt(30)
+        pf.space_after = Pt(30)
+        pf.space_before = Pt(0)
+    else:
+        pf.line_spacing = Pt(24)
+        pf.space_after = Pt(18)
+        pf.space_before = Pt(0)
+    set_run(p.add_run(text), HEI, HEI, 18 if level == 1 else 16)
+    st = p.style
+    st.font.color.rgb = RGBColor(0, 0, 0)
+    st.font.name = TNR
+    st.element.rPr.rFonts.set(qn("w:eastAsia"), HEI)
+    return p
 
 
 def cover(doc, title):
@@ -177,6 +208,10 @@ def build(src, dst):
     body_lines = lines[body_start:]
 
     doc = Document()
+    # 打开文档时自动更新域(目录等)
+    uf = OxmlElement("w:updateFields")
+    uf.set(qn("w:val"), "true")
+    doc.settings.element.append(uf)
     # 页面: A4, 天头/订口25mm+, 地脚/切口20mm+
     s1 = doc.sections[0]
     s1.page_width, s1.page_height = Cm(21), Cm(29.7)
@@ -220,9 +255,9 @@ def build(src, dst):
             parse_table(pending_table, doc)
             continue
         if line.startswith("# "):
-            para(doc, line[2:].strip(), HEI, HEI, 18, align=WD_ALIGN_PARAGRAPH.CENTER, line=30, after=30)
+            heading(doc, line[2:].strip(), 1)
         elif line.startswith("## "):
-            para(doc, line[3:].strip(), HEI, HEI, 16, line=24, after=18)
+            heading(doc, line[3:].strip(), 2)
         elif line.startswith("### "):
             para(doc, line[4:].strip(), HEI, HEI, 15, line=20, after=12)
         elif line.startswith("!["):
