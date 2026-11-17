@@ -92,9 +92,9 @@ def cover(doc, title):
     para(doc, "福州大学", HEI, HEI, 26, align=WD_ALIGN_PARAGRAPH.CENTER, line=36)
     para(doc, "本科毕业论文", HEI, HEI, 22, align=WD_ALIGN_PARAGRAPH.CENTER, line=32, after=36)
     para(doc, title, HEI, HEI, 18, align=WD_ALIGN_PARAGRAPH.CENTER, line=30, after=48)
-    info = [("学    院", "＿＿＿＿＿＿＿＿"), ("专    业", "软件工程"),
+    info = [("学    院", "计算机与大数据学院"), ("专    业", "软件工程"),
             ("年    级", "2024级"), ("学    号", "102400216"),
-            ("学生姓名", "黄思哲"), ("指导教师", "＿＿＿＿＿＿"),
+            ("学生姓名", "黄思哲"), ("指导教师", "胡桓"),
             ("完成日期", "2026年11月")]
     for k, v in info:
         p = doc.add_paragraph()
